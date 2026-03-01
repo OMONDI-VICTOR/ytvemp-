@@ -1,0 +1,59 @@
+
+<script src="https://cdn.tiny.cloud/1/4b6nwvoy8jp9jofxc5n3xjivx15k9kkneoudhadtirepirjq/6/tinymce.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    tinymce.init({
+        selector: '#content',
+        height: 500,
+        plugins: 'image paste link lists code fullscreen table heading',
+        toolbar: 'formatselect | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | link image | table | code fullscreen',
+        menubar: 'edit view insert format tools',
+        content_style: 'body { font-family: Arial, sans-serif; font-size: 14px; }',
+        images_upload_handler: function(blobInfo, progress) {
+            var xhr = new XMLHttpRequest();
+            xhr.withCredentials = false;
+            xhr.open('POST', '../upload_image.php');
+            xhr.upload.onprogress = function(e) {
+                progress(e.loaded / e.total * 100);
+            };
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    var json = JSON.parse(xhr.responseText);
+                    if (!json || typeof json.location != 'string') {
+                        return xhr.status === 200;
+                    }
+                    success(json.location);
+                } else {
+                    failure('Upload error');
+                }
+            };
+            xhr.onerror = function() { failure('Image upload failed'); };
+            var formData = new FormData();
+            formData.append('file', blobInfo.blob(), blobInfo.filename());
+            xhr.send(formData);
+        },
+        paste_data_images: true,
+        automatic_uploads: true,
+        file_picker_types: 'image',
+        file_picker_callback: function(callback, value, meta) {
+            var input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('accept', 'image/*');
+            input.onchange = function() {
+                var file = this.files[0];
+                var reader = new FileReader();
+                reader.onload = function() {
+                    var id = 'blobid' + (new Date()).getTime();
+                    var blobCache = tinymce.activeEditor.editorUpload.blobCache;
+                    var base64 = reader.result.split(',')[1];
+                    var blobInfo = blobCache.create(id, file, base64);
+                    blobCache.add(blobInfo);
+                    callback(blobInfo.blobUri(), { title: file.name });
+                };
+                reader.readAsDataURL(file);
+            };
+            input.click();
+        }
+    });
+});
+</script>

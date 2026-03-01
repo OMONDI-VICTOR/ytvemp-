@@ -1,0 +1,4 @@
+# Editor uploads
+assets/uploads/
+*.log
+.DS_Store

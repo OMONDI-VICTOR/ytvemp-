@@ -1,0 +1,2 @@
+This folder stores images uploaded from the TinyMCE editor. Ensure the webserver/PHP process has write permission to this directory.
+Do not remove existing uploaded files unless you no longer need them.
