@@ -81,7 +81,7 @@ mysqli_stmt_execute($stmt);
 mysqli_stmt_bind_result($stmt, $is_completed);
 $lesson_completed = mysqli_stmt_fetch($stmt) ? $is_completed : false;
 mysqli_stmt_close($stmt);
-
+//comment
 // Get next and previous lessons
 $sql_next = "SELECT id, lesson_title FROM course_lessons WHERE module_id = ? AND lesson_order > (SELECT lesson_order FROM course_lessons WHERE id = ?) ORDER BY lesson_order LIMIT 1";
 $stmt = mysqli_prepare($conn, $sql_next);
